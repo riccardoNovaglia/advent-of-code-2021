@@ -1,3 +1,6 @@
+from src.inputs.inputs import get_cleaned_up_input
+
+
 def get_windows(input_readings: [int]) -> [(int, int, int)]:
     windows = []
     for index in range(len(input_readings) - 2):
@@ -26,7 +29,6 @@ def count_windows_increments(readings: [int]) -> int:
 
 
 if __name__ == "__main__":
-    with open("./input.txt", "r") as file:
-        readings = [int(line.strip()) for line in (file.readlines()) if line != ""]
-        print("readings increments: ", count_increments(readings))
-        print("windowed increments: ", count_windows_increments(readings))
+    readings = [int(reading) for reading in get_cleaned_up_input()]
+    print("readings increments: ", count_increments(readings))
+    print("windowed increments: ", count_windows_increments(readings))

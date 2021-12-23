@@ -1,3 +1,6 @@
+from src.inputs.inputs import get_cleaned_up_input
+
+
 def diagnose(readings: [str]) -> (str, str):
     readings_length = len(readings[0].strip())
 
@@ -41,17 +44,14 @@ def oxygen_and_co2_ratings(readings: [str]) -> (str, str):
 
 
 if __name__ == "__main__":
-    with open("./input.txt", "r") as file:
-        readings = file.readlines()
-        gamma, epsilon = diagnose(readings)
-        gamma_decimal = int(gamma, 2)
-        epsilon_decimal = int(epsilon, 2)
-        print(
-            f"Gamma: {gamma} ({gamma_decimal}), Epsilon: {epsilon} ({epsilon_decimal})"
-        )
-        print(f"Power consumption: {gamma_decimal * epsilon_decimal}")
-        oxygen, co2 = oxygen_and_co2_ratings(readings)
-        oxygen_decimal = int(oxygen, 2)
-        co2_decimal = int(co2, 2)
-        print(f"Oxygen: {oxygen} ({oxygen_decimal}), CO2: {co2} ({co2_decimal})")
-        print(f"Life support rating: {oxygen_decimal * co2_decimal}")
+    readings = get_cleaned_up_input()
+    gamma, epsilon = diagnose(readings)
+    gamma_decimal = int(gamma, 2)
+    epsilon_decimal = int(epsilon, 2)
+    print(f"Gamma: {gamma} ({gamma_decimal}), Epsilon: {epsilon} ({epsilon_decimal})")
+    print(f"Power consumption: {gamma_decimal * epsilon_decimal}")
+    oxygen, co2 = oxygen_and_co2_ratings(readings)
+    oxygen_decimal = int(oxygen, 2)
+    co2_decimal = int(co2, 2)
+    print(f"Oxygen: {oxygen} ({oxygen_decimal}), CO2: {co2} ({co2_decimal})")
+    print(f"Life support rating: {oxygen_decimal * co2_decimal}")

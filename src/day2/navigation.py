@@ -1,3 +1,6 @@
+from src.inputs.inputs import get_cleaned_up_input
+
+
 class JumpedOutOfWaterException(Exception):
     pass
 
@@ -41,12 +44,11 @@ def navigate_with_aim(directions: [str]) -> (int, int):
 
 
 if __name__ == "__main__":
-    with open("input.txt", "r") as file:
-        directions = file.readlines()
-        horizontal, depth = navigate(directions)
-        print(f"End state is {horizontal},-{depth}, multiplied: {horizontal * depth}")
-        horizontal, depth = navigate_with_aim(directions)
-        print(
-            f"End state with aim is {horizontal},-{depth}, multiplied:"
-            f" {horizontal * depth}"
-        )
+    directions = get_cleaned_up_input()
+    horizontal, depth = navigate(directions)
+    print(f"End state is {horizontal},-{depth}, multiplied: {horizontal * depth}")
+    horizontal, depth = navigate_with_aim(directions)
+    print(
+        f"End state with aim is {horizontal},-{depth}, multiplied:"
+        f" {horizontal * depth}"
+    )
