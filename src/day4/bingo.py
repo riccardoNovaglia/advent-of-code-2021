@@ -47,17 +47,36 @@ class BingoBoard:
         return self.cells == other.cells
 
 
-def play_bingo(input_string: str) -> (BingoBoard, int):
+def parse_input(input_string):
     [inputs_string, *boards_strings] = input_string.split("\n\n")
     moves = [int(input_value) for input_value in inputs_string.split(",")]
     boards = [
         BingoBoard.from_string_input(board_string) for board_string in boards_strings
     ]
+    return boards, moves
+
+
+def play_bingo(input_string: str) -> (BingoBoard, int):
+    boards, moves = parse_input(input_string)
     for i in moves:
         for board in boards:
             board.mark(i)
             if board.has_won():
                 return board, i
+
+
+def play_to_lose(input_string: str) -> (BingoBoard, int):
+    boards, moves = parse_input(input_string)
+    last_winner_board = None
+    last_winner_move = None
+    for i in moves:
+        for board in boards:
+            if not board.has_won():
+                board.mark(i)
+                if board.has_won():
+                    last_winner_board = board
+                    last_winner_move = i
+    return last_winner_board, last_winner_move
 
 
 if __name__ == "__main__":
@@ -66,3 +85,10 @@ if __name__ == "__main__":
     print(f"Found a winner after move {last_move}")
     print(f"Unmarked cells sum is {sum(winning_board.non_marked_cells())}")
     print(f"Final score is {sum(winning_board.non_marked_cells()) * last_move}")
+
+    print()
+
+    loser_board, last_winner_move = play_to_lose(game)
+    print(f"Found loser after move {last_winner_move}")
+    print(f"Unmarked cells sum is {sum(loser_board.non_marked_cells())}")
+    print(f"Final score is {sum(loser_board.non_marked_cells()) * last_winner_move}")
