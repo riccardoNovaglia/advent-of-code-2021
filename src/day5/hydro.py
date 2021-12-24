@@ -20,19 +20,23 @@ class Line:
     start: Point
     end: Point
 
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
+        if self.start.y == self.end.y:
+            self.direction = "horizontal"
+        elif self.start.x == self.end.x:
+            self.direction = "vertical"
+        else:
+            self.direction = "diagonal"
+
     @staticmethod
     def from_string(string):
         [start_string, end_string] = string.split(" -> ")
         return Line(Point.from_string(start_string), Point.from_string(end_string))
 
-    def is_horizontal(self):
-        return self.start.y == self.end.y
-
-    def is_vertical(self):
-        return self.start.x == self.end.x
-
     def is_straight(self):
-        return self.is_horizontal() or self.is_vertical()
+        return self.direction is not "diagonal"
 
     def max_x(self):
         return max([self.start.x, self.end.x])
@@ -61,16 +65,17 @@ class HydroField:
         self.field[y][x] += 1
 
     def mark_line(self, line: Line):
-        if line.is_horizontal():
-            for i in line.x_range():
-                self.mark(i, line.start.y)
-        elif line.is_vertical():
-            for i in line.y_range():
-                self.mark(line.start.x, i)
-        else:
-            z = list(zip(list(line.x_range()), list(line.y_range())))
-            for x, y in z:
-                self.mark(x, y)
+        match line.direction:
+            case "horizontal":
+                for i in line.x_range():
+                    self.mark(i, line.start.y)
+            case "vertical":
+                for i in line.y_range():
+                    self.mark(line.start.x, i)
+            case "diagonal":
+                z = list(zip(list(line.x_range()), list(line.y_range())))
+                for x, y in z:
+                    self.mark(x, y)
 
     def count_hotspots(self):
         all_points = list(itertools.chain(*self.field))

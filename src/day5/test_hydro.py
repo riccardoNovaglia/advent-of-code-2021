@@ -54,13 +54,9 @@ class TestHydroField(TestCase):
 
 
 class TestLine(TestCase):
-    def test_line_can_tell_if_its_horizontal(self):
-        self.assertTrue(l(p(0, 0), p(5, 0)).is_horizontal())
-        self.assertFalse(l(p(0, 3), p(0, 4)).is_horizontal())
-
-    def test_line_can_tell_if_its_vertical(self):
-        self.assertTrue(l(p(0, 3), p(0, 4)).is_vertical())
-        self.assertFalse(l(p(0, 0), p(5, 0)).is_vertical())
+    def test_line_can_tell_its_direction(self):
+        self.assertEqual("horizontal", l(p(0, 0), p(5, 0)).direction)
+        self.assertEqual("vertical", l(p(0, 3), p(0, 4)).direction)
 
     def test_line_can_tell_if_its_straight(self):
         self.assertTrue(l(p(0, 3), p(0, 4)).is_straight())
