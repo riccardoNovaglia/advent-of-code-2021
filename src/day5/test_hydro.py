@@ -1,6 +1,10 @@
+from typing import Type
 from unittest import TestCase
 
-from src.day5.hydro import HydroField, Line, count_hotspots, get_dimensions
+from src.day5.hydro import HydroField, Line, Point, count_hotspots, get_dimensions
+
+p: Type[Point] = Point
+l: Type[Line] = Line
 
 
 class TestHydroField(TestCase):
@@ -16,17 +20,17 @@ class TestHydroField(TestCase):
 
     def test_increases_the_value_for_a_horizontal_line(self):
         field = HydroField(2, 2)
-        field.mark_line(Line((0, 0), (1, 0)))
+        field.mark_line(l(p(0, 0), p(1, 0)))
         self.assertEqual([[1, 1], [0, 0]], field.field)
 
     def test_increases_the_value_for_a_vertical_line(self):
         field = HydroField(2, 2)
-        field.mark_line(Line((1, 0), (1, 1)))
+        field.mark_line(l(p(1, 0), p(1, 1)))
         self.assertEqual([[0, 1], [0, 1]], field.field)
 
     def test_increases_a_horizontal_line_expressed_backwards(self):
         field = HydroField(2, 2)
-        field.mark_line(Line((1, 0), (0, 0)))
+        field.mark_line(l(p(1, 0), p(0, 0)))
         self.assertEqual([[1, 1], [0, 0]], field.field)
 
     def test_counts_hotspots(self):
@@ -41,38 +45,38 @@ class TestHydroField(TestCase):
 
 class TestLine(TestCase):
     def test_line_can_tell_if_its_horizontal(self):
-        self.assertTrue(Line((0, 0), (5, 0)).is_horizontal())
-        self.assertFalse(Line((0, 3), (0, 4)).is_horizontal())
+        self.assertTrue(l(p(0, 0), p(5, 0)).is_horizontal())
+        self.assertFalse(l(p(0, 3), p(0, 4)).is_horizontal())
 
     def test_line_can_tell_if_its_vertical(self):
-        self.assertTrue(Line((0, 3), (0, 4)).is_vertical())
-        self.assertFalse(Line((0, 0), (5, 0)).is_vertical())
+        self.assertTrue(l(p(0, 3), p(0, 4)).is_vertical())
+        self.assertFalse(l(p(0, 0), p(5, 0)).is_vertical())
 
     def test_line_can_tell_if_its_straight(self):
-        self.assertTrue(Line((0, 3), (0, 4)).is_straight())
-        self.assertFalse(Line((1, 3), (2, 4)).is_straight())
-
-    def test_can_return_its_points_in_increasing_order(self):
-        self.assertEqual(((0, 0), (0, 1)), Line((0, 0), (0, 1)).ordered_points())
-        self.assertEqual(((0, 0), (0, 1)), Line((0, 1), (0, 0)).ordered_points())
-        self.assertEqual(((0, 0), (1, 0)), Line((1, 0), (0, 0)).ordered_points())
+        self.assertTrue(l(p(0, 3), p(0, 4)).is_straight())
+        self.assertFalse(l(p(1, 3), p(2, 4)).is_straight())
 
     def test_can_be_created_from_a_string(self):
         line = Line.from_string("0,0 -> 0,1")
-        self.assertEqual(Line((0, 0), (0, 1)), line)
+        self.assertEqual(l(p(0, 0), p(0, 1)), line)
 
-    def test_returns_its_maximum_x_and_y(self):
-        self.assertEqual((0, 4), Line((0, 3), (0, 4)).max_dimensions())
-        self.assertEqual((2, 4), Line((1, 3), (2, 4)).max_dimensions())
+    def test_returns_its_x_range_and_y_range_with_inclusive_ends(self):
+        self.assertEqual(range(1, 3), l(p(2, 3), p(1, 4)).x_range())
+        self.assertEqual(range(3, 5), l(p(0, 3), p(0, 4)).y_range())
+
+
+class TestPoint(TestCase):
+    def test_point_can_be_created_from_a_string(self):
+        self.assertEqual(Point(2, 3), Point.from_string("2,3"))
 
 
 class TestWithInput(TestCase):
     def test_finds_the_max_x_y_for_a_list_of_lines(self):
         max_x, max_y = get_dimensions(
             [
-                Line((0, 0), (0, 1)),
-                Line((3, 2), (5, 2)),
-                Line((0, 4), (0, 1)),
+                l(p(0, 0), p(0, 1)),
+                l(p(3, 2), p(5, 2)),
+                l(p(0, 4), p(0, 1)),
             ]
         )
         self.assertEqual((6, 5), (max_x, max_y))

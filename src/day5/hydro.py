@@ -1,82 +1,73 @@
+import itertools
+from dataclasses import dataclass
+
 from src.inputs.inputs import get_cleaned_up_input
 
-Point = (int, int)
+
+@dataclass()
+class Point:
+    x: int
+    y: int
+
+    @staticmethod
+    def from_string(string):
+        [x, y] = string.split(",")
+        return Point(int(x), int(y))
 
 
-def parse_point(start_string) -> Point:
-    [x, y] = start_string.split(",")
-    return int(x), int(y)
-
-
+@dataclass()
 class Line:
-    def __init__(self, start: Point, end: Point):
-        self.start = start
-        self.end = end
-        self.points = (start, end)
-
-    def __eq__(self, other):
-        return self.start == other.start and self.end == other.end
+    start: Point
+    end: Point
 
     @staticmethod
     def from_string(string):
         [start_string, end_string] = string.split(" -> ")
-        return Line(parse_point(start_string), parse_point(end_string))
+        return Line(Point.from_string(start_string), Point.from_string(end_string))
 
     def is_horizontal(self):
-        return self.start[1] == self.end[1]
+        return self.start.y == self.end.y
 
     def is_vertical(self):
-        return self.start[0] == self.end[0]
+        return self.start.x == self.end.x
 
     def is_straight(self):
         return self.is_horizontal() or self.is_vertical()
 
-    def ordered_points(self) -> (int, int):
-        if self.is_horizontal():
-            if self.start[0] > self.end[0]:
-                return self.end, self.start
-        else:
-            if self.start[1] > self.end[1]:
-                return self.end, self.start
-        return self.start, self.end
+    def x_range(self):
+        xs = [self.start.x, self.end.x]
+        return range(min(xs), max(xs) + 1)
 
-    def max_dimensions(self):
-        x1, y1 = self.start
-        x2, y2 = self.end
-        return max([x1, x2]), max([y1, y2])
+    def y_range(self):
+        ys = [self.start.y, self.end.y]
+        return range(min(ys), max(ys) + 1)
 
 
 class HydroField:
     def __init__(self, x, y):
-        self.field = []
-        for i in range(y):
-            column = [0] * x
-            self.field.append(column)
+        self.field = [[0] * x for _ in range(y)]
 
     def mark(self, x, y):
         self.field[y][x] += 1
 
     def mark_line(self, line: Line):
-        start, end = line.ordered_points()
         if line.is_horizontal():
-            for i in range(start[0], end[0] + 1):
-                self.mark(i, start[1])
+            for i in line.x_range():
+                self.mark(i, line.start.y)
         else:
-            for i in range(start[1], end[1] + 1):
-                self.mark(start[0], i)
+            for i in line.y_range():
+                self.mark(line.start.x, i)
 
     def count_hotspots(self):
-        count = 0
-        for i in range(len(self.field)):
-            for j in range(len(self.field[0])):
-                if self.field[i][j] > 1:
-                    count += 1
-        return count
+        all_points = list(itertools.chain(*self.field))
+        return len(list(filter(lambda point: point > 1, all_points)))
 
 
 def get_dimensions(lines: [Line]) -> (int, int):
-    maxes = [line.max_dimensions() for line in lines]
-    return max([x for x, y in maxes]) + 1, max([y for x, y in maxes]) + 1
+    return (
+        max([line.x_range().stop for line in lines]),
+        max([line.y_range().stop for line in lines]),
+    )
 
 
 def count_hotspots(input_lines: [str]) -> int:
