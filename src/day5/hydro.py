@@ -1,8 +1,11 @@
-import itertools
-
 from src.inputs.inputs import get_cleaned_up_input
 
 Point = (int, int)
+
+
+def parse_point(start_string) -> Point:
+    [x, y] = start_string.split(",")
+    return int(x), int(y)
 
 
 class Line:
@@ -13,6 +16,11 @@ class Line:
 
     def __eq__(self, other):
         return self.start == other.start and self.end == other.end
+
+    @staticmethod
+    def from_string(string):
+        [start_string, end_string] = string.split(" -> ")
+        return Line(parse_point(start_string), parse_point(end_string))
 
     def is_horizontal(self):
         return self.start[1] == self.end[1]
@@ -31,6 +39,11 @@ class Line:
             if self.start[1] > self.end[1]:
                 return self.end, self.start
         return self.start, self.end
+
+    def max_dimensions(self):
+        x1, y1 = self.start
+        x2, y2 = self.end
+        return max([x1, x2]), max([y1, y2])
 
 
 class HydroField:
@@ -61,32 +74,19 @@ class HydroField:
         return count
 
 
-def parse_point(start_string) -> Point:
-    [x, y] = start_string.split(",")
-    return int(x), int(y)
-
-
-def parse_line(line) -> Line:
-    [start_string, end_string] = line.split(" -> ")
-    return Line(parse_point(start_string), parse_point(end_string))
-
-
-def get_lines_for_input(input_lines: [str]) -> [Line]:
-    return [parse_line(line) for line in input_lines]
-
-
 def get_dimensions(lines: [Line]) -> (int, int):
-    flat_points = list(itertools.chain(*[line.points for line in lines]))
-    all_x = [point[0] for point in flat_points]
-    all_y = [point[1] for point in flat_points]
-    return max(all_x) + 1, max(all_y) + 1
+    maxes = [line.max_dimensions() for line in lines]
+    return max([x for x, y in maxes]) + 1, max([y for x, y in maxes]) + 1
 
 
 def count_hotspots(input_lines: [str]) -> int:
-    lines = get_lines_for_input(input_lines)
+    lines = [Line.from_string(line) for line in input_lines]
+
     x, y = get_dimensions(lines)
     field = HydroField(x, y)
+
     horizontal_lines = list(filter(lambda line: line.is_straight(), lines))
+
     for line in horizontal_lines:
         field.mark_line(line)
     return field.count_hotspots()

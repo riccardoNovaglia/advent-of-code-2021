@@ -1,12 +1,6 @@
 from unittest import TestCase
 
-from src.day5.hydro import (
-    HydroField,
-    Line,
-    count_hotspots,
-    get_dimensions,
-    get_lines_for_input,
-)
+from src.day5.hydro import HydroField, Line, count_hotspots, get_dimensions
 
 
 class TestHydroField(TestCase):
@@ -63,12 +57,16 @@ class TestLine(TestCase):
         self.assertEqual(((0, 0), (0, 1)), Line((0, 1), (0, 0)).ordered_points())
         self.assertEqual(((0, 0), (1, 0)), Line((1, 0), (0, 0)).ordered_points())
 
+    def test_can_be_created_from_a_string(self):
+        line = Line.from_string("0,0 -> 0,1")
+        self.assertEqual(Line((0, 0), (0, 1)), line)
+
+    def test_returns_its_maximum_x_and_y(self):
+        self.assertEqual((0, 4), Line((0, 3), (0, 4)).max_dimensions())
+        self.assertEqual((2, 4), Line((1, 3), (2, 4)).max_dimensions())
+
 
 class TestWithInput(TestCase):
-    def test_parses_the_instructions_to_the_right_sets_of_points(self):
-        points = get_lines_for_input(["0,0 -> 0,1"])
-        self.assertEqual([Line((0, 0), (0, 1))], points)
-
     def test_finds_the_max_x_y_for_a_list_of_lines(self):
         max_x, max_y = get_dimensions(
             [
