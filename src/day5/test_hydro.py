@@ -33,6 +33,16 @@ class TestHydroField(TestCase):
         field.mark_line(l(p(1, 0), p(0, 0)))
         self.assertEqual([[1, 1], [0, 0]], field.field)
 
+    def test_increases_a_diagonal_line(self):
+        field = HydroField(2, 2)
+        field.mark_line(l(p(0, 0), p(1, 1)))
+        self.assertEqual([[1, 0], [0, 1]], field.field)
+
+    def test_increases_a_diagonal_line_backwards(self):
+        field = HydroField(2, 2)
+        field.mark_line(l(p(1, 0), p(0, 1)))
+        self.assertEqual([[0, 1], [1, 0]], field.field)
+
     def test_counts_hotspots(self):
         field = HydroField(2, 2)
         field.mark(0, 0)
@@ -60,9 +70,16 @@ class TestLine(TestCase):
         line = Line.from_string("0,0 -> 0,1")
         self.assertEqual(l(p(0, 0), p(0, 1)), line)
 
-    def test_returns_its_x_range_and_y_range_with_inclusive_ends(self):
-        self.assertEqual(range(1, 3), l(p(2, 3), p(1, 4)).x_range())
-        self.assertEqual(range(3, 5), l(p(0, 3), p(0, 4)).y_range())
+    def test_returns_its_max_x_y(self):
+        self.assertEqual(2, l(p(2, 3), p(1, 4)).max_x())
+        self.assertEqual(4, l(p(0, 3), p(0, 4)).max_y())
+
+    def test_returns_its_x_range_and_y_range_with_inclusive_ends_and_right_step(self):
+        self.assertEqual(range(1, 3), l(p(1, 0), p(2, 0)).x_range())
+        self.assertEqual(range(2, 0, -1), l(p(2, 0), p(1, 0)).x_range())
+
+        self.assertEqual(range(3, 6), l(p(2, 3), p(2, 5)).y_range())
+        self.assertEqual(range(5, 2, -1), l(p(0, 5), p(0, 3)).y_range())
 
 
 class TestPoint(TestCase):
