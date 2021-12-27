@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from src.day6.fishes import Fishes
+from src.day6.fishes import Fishes, FishesGroup
 
 
 class TestFishes(TestCase):
@@ -26,6 +26,62 @@ class TestFishes(TestCase):
         self.assertEqual([6, 8, 0], fishes.fishes)
         fishes.tick_day()
         self.assertEqual([5, 7, 6, 8], fishes.fishes)
+
+
+class TestFishesGroups(TestCase):
+    def test_creates_fishes_and_groups_them_by_age(self):
+        fishes = FishesGroup([1, 4, 6, 6, 8, 8, 8])
+        self.assertEqual(
+            {
+                0: 0,
+                1: 1,
+                2: 0,
+                3: 0,
+                4: 1,
+                5: 0,
+                6: 2,
+                7: 0,
+                8: 3,
+            },
+            fishes.groups,
+        )
+        self.assertEqual(7, fishes.count_fishes())
+
+    def test_ages_shift_left_daily(self):
+        fishes = FishesGroup([1, 4, 6, 6, 8, 8, 8])
+        fishes.tick_day()
+        self.assertEqual(
+            {
+                0: 1,
+                1: 0,
+                2: 0,
+                3: 1,
+                4: 0,
+                5: 2,
+                6: 0,
+                7: 3,
+                8: 0,
+            },
+            fishes.groups,
+        )
+
+    def test_age_0_groups_reset_to_6_and_generates_a_new_gen_at_8(self):
+        fishes = FishesGroup([0, 0, 0, 7])
+        fishes.tick_day()
+        self.assertEqual(
+            {
+                0: 0,
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0,
+                6: 4,
+                7: 0,
+                8: 3,
+            },
+            fishes.groups,
+        )
 
 
 class TestInput(TestCase):
@@ -76,4 +132,10 @@ class TestInput(TestCase):
             expected_fishes,
             actual_fishes,
         )
+        self.assertEqual(26, fishes.count_fishes())
+
+    def test_groups_work_with_the_sample_input(self):
+        fishes = FishesGroup.from_string("3,4,3,1,2")
+        for i in range(18):
+            fishes.tick_day()
         self.assertEqual(26, fishes.count_fishes())
