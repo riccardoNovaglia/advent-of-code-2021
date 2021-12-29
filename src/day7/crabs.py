@@ -10,9 +10,8 @@ def get_least_fuel_for_constant_burn(crabs_list):
 
 
 def calculate_fuel_consumption_for_distance(start, end):
-    previous = 0
     distance = abs(start - end)
-    return sum([i + previous for i in range(1, distance + 1)])
+    return sum(range(1, distance + 1))
 
 
 def get_least_fuel_for_increasing_burn(crabs_list):
